@@ -1,0 +1,56 @@
+import type { Project } from '../types';
+
+export const projects: Project[] = [
+  {
+    id: 'portfolio',
+    title: 'Steam-Style Portfolio',
+    summary: 'Personal brand website with AWS-backed private productivity workspace.',
+    description:
+      'Recruiter-focused portfolio with Steam-inspired interface language, optimized loading, and production deployment flow.',
+    stacks: ['React', 'TypeScript', 'Vite', 'Tailwind CSS', 'AWS S3', 'CloudFront', 'Route 53', 'ACM'],
+    githubUrl: 'https://github.com/your-username/portfolio',
+    liveUrl: 'https://your-domain.com',
+    banner: '/banners/portfolio.svg',
+    hours: 240,
+    lastUpdated: '27 Feb',
+    progressDone: 50,
+    progressTotal: 50,
+    badges: ['UI', 'API', 'DB', 'AUTH', 'SEO'],
+    extraCount: 35,
+    plannedFeatures: []
+  },
+  {
+    id: 'serverless-tracker',
+    title: 'Serverless Habit Tracker',
+    summary: 'Event-driven habit tracker with API Gateway, Lambda, and Cognito auth.',
+    description:
+      'Habit tracker with event-driven backend, robust observability, and secure user-scoped task processing.',
+    stacks: ['AWS Lambda', 'API Gateway', 'DynamoDB', 'EventBridge', 'CloudWatch', 'IAM'],
+    githubUrl: 'https://github.com/your-username/habit-tracker',
+    banner: '/banners/tracker.svg',
+    hours: 86,
+    lastUpdated: '22 Feb',
+    progressDone: 34,
+    progressTotal: 34,
+    badges: ['AWS', 'EVT', 'OPS', 'TEST', 'CI'],
+    extraCount: 14,
+    plannedFeatures: []
+  },
+  {
+    id: 'data-lab',
+    title: 'Cloud Data Lab',
+    summary: 'Data exploration dashboards with static hosting and scheduled ETL jobs.',
+    description:
+      'Cloud analytics sandbox for exploring datasets, building dashboards, and validating cost-efficient data pipelines.',
+    stacks: ['Amazon S3', 'Athena', 'QuickSight', 'Glue', 'Lambda', 'CloudWatch'],
+    githubUrl: 'https://github.com/your-username/data-lab',
+    banner: '/banners/datalab.svg',
+    hours: 64,
+    lastUpdated: '18 Feb',
+    progressDone: 20,
+    progressTotal: 20,
+    badges: ['ETL', 'ATH', 'DASH', 'IAM', 'MON'],
+    extraCount: 9,
+    plannedFeatures: []
+  }
+];
