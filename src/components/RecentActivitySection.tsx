@@ -1,16 +1,143 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { projects } from '../data/projects';
+import type { Project } from '../types';
+
+const DEFAULT_CSV_URL = '/data/projects.csv';
+
+function parseCsv(text: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let cell = '';
+  let inQuotes = false;
+
+  for (let index = 0; index < text.length; index += 1) {
+    const char = text[index];
+    const next = text[index + 1];
+
+    if (char === '"') {
+      if (inQuotes && next === '"') {
+        cell += '"';
+        index += 1;
+      } else {
+        inQuotes = !inQuotes;
+      }
+      continue;
+    }
+
+    if (!inQuotes && char === ',') {
+      row.push(cell.trim());
+      cell = '';
+      continue;
+    }
+
+    if (!inQuotes && (char === '\n' || char === '\r')) {
+      if (char === '\r' && next === '\n') {
+        index += 1;
+      }
+      row.push(cell.trim());
+      rows.push(row);
+      row = [];
+      cell = '';
+      continue;
+    }
+
+    cell += char;
+  }
+
+  if (cell.length > 0 || row.length > 0) {
+    row.push(cell.trim());
+    rows.push(row);
+  }
+
+  return rows.filter((csvRow) => csvRow.length > 1 || csvRow[0] !== '');
+}
+
+function splitList(value: string): string[] {
+  if (!value) return [];
+  return value
+    .split('|')
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function toNumber(value: string, fallback = 0): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function mapCsvToProjects(csvText: string): Project[] {
+  const rows = parseCsv(csvText);
+  if (rows.length < 2) return [];
+
+  const [headers, ...dataRows] = rows;
+  const headerIndex = new Map(headers.map((header, index) => [header, index]));
+
+  const get = (row: string[], key: string) => {
+    const idx = headerIndex.get(key);
+    return idx === undefined ? '' : (row[idx] ?? '').trim();
+  };
+
+  return dataRows
+    .map((row) => ({
+      id: get(row, 'id'),
+      title: get(row, 'title'),
+      summary: get(row, 'summary'),
+      description: get(row, 'description'),
+      stacks: splitList(get(row, 'stacks')),
+      githubUrl: get(row, 'githubUrl'),
+      liveUrl: get(row, 'liveUrl') || undefined,
+      banner: get(row, 'banner'),
+      hours: toNumber(get(row, 'hours')),
+      lastUpdated: get(row, 'lastUpdated'),
+      progressDone: toNumber(get(row, 'progressDone')),
+      progressTotal: toNumber(get(row, 'progressTotal')),
+      badges: splitList(get(row, 'badges')),
+      extraCount: toNumber(get(row, 'extraCount')),
+      plannedFeatures: splitList(get(row, 'plannedFeatures'))
+    }))
+    .filter((project) => project.id && project.title && project.summary);
+}
 
 export function RecentActivitySection() {
+  const [projectList, setProjectList] = useState<Project[]>(projects);
   const allStacks = useMemo(
-    () => Array.from(new Set(projects.flatMap((p) => p.stacks))).sort((a, b) => a.localeCompare(b)),
-    []
+    () => Array.from(new Set(projectList.flatMap((p) => p.stacks))).sort((a, b) => a.localeCompare(b)),
+    [projectList]
   );
   const [selectedStack, setSelectedStack] = useState<string>('All');
   const [expandedProjectId, setExpandedProjectId] = useState<string | null>(null);
 
+  useEffect(() => {
+    let isMounted = true;
+    const csvUrl = import.meta.env.VITE_PROJECTS_CSV_URL || DEFAULT_CSV_URL;
+
+    async function loadProjects() {
+      try {
+        const response = await fetch(csvUrl, { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error(`Failed to fetch CSV (${response.status})`);
+        }
+        const csvText = await response.text();
+        const parsedProjects = mapCsvToProjects(csvText);
+
+        if (isMounted && parsedProjects.length > 0) {
+          setProjectList(parsedProjects);
+        }
+      } catch (error) {
+        console.warn('Failed to load projects CSV, using static fallback data.', error);
+      }
+    }
+
+    loadProjects();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const filtered =
-    selectedStack === 'All' ? projects : projects.filter((project) => project.stacks.includes(selectedStack));
+    selectedStack === 'All'
+      ? projectList
+      : projectList.filter((project) => project.stacks.includes(selectedStack));
   const totalHours = filtered.reduce((sum, project) => sum + project.hours, 0);
 
   return (
@@ -44,8 +171,9 @@ export function RecentActivitySection() {
 
       <div className="space-y-4">
         {filtered.map((project) => {
-          const plannedFeatureCount = project.progressTotal - project.progressDone;
+          const plannedFeatureCount = Math.max(project.progressTotal - project.progressDone, 0);
           const isExpanded = expandedProjectId === project.id;
+          const progressPercent = project.progressTotal > 0 ? (project.progressDone / project.progressTotal) * 100 : 0;
 
           return (
             <article key={project.id} className="rounded border border-sky-200/10 bg-black/45 p-3 sm:p-4">
@@ -77,7 +205,7 @@ export function RecentActivitySection() {
                     <div className="h-6 flex-1 rounded-full border border-black/70 bg-slate-950/80 p-1">
                       <div
                         className="h-full rounded-full bg-gradient-to-r from-slate-500 to-slate-300"
-                        style={{ width: `${(project.progressDone / project.progressTotal) * 100}%` }}
+                        style={{ width: `${progressPercent}%` }}
                       />
                     </div>
                   </div>
