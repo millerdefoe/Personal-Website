@@ -1,47 +1,78 @@
 import { RecentActivitySection } from '../components/RecentActivitySection';
+import { Link } from 'react-router-dom';
 
 export function HomePage() {
   return (
-    <section className="space-y-6">
-      <div className="section-card relative overflow-hidden rounded-xl p-6">
-        <div className="absolute right-0 top-0 h-44 w-44 rounded-full bg-cyan-400/10 blur-2xl" />
-        <div className="relative z-10 flex flex-col gap-4 sm:flex-row sm:items-start">
-          <img
-            src="/profile-photo.JPG"
-            alt="Portrait photo"
-            className="h-44 w-32 rounded border border-sky-200/20 object-cover sm:h-52 sm:w-40"
-          />
-          <div>
-            <p className="badge mb-3 inline-block rounded px-2 py-1 text-xs">Available for Internships</p>
-            <h1 className="font-display text-3xl text-cyan-100 sm:text-4xl">Spyridon Giakoumatos</h1>
-            <p className="mt-3 max-w-2xl text-lg text-sky-100/85">
-              I'm a computer science student at Nanyang Technological University (NTU), 
-              specializing in artificial intelligence. I am an avid gamer as you can tell from my Steam inspired portfolio!
-            </p>
+    <section>
+      <div className="section-card overflow-hidden rounded-xl p-4 sm:p-6">
+        <div className="space-y-5">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="flex flex-col gap-4 sm:flex-row">
+              <div className="relative">
+                <img
+                  src="/profile-photo.JPG"
+                  alt="Portrait photo"
+                  className="h-40 w-40 rounded-sm border border-cyan-300/45 object-cover shadow-[0_0_25px_rgba(43,209,255,0.35)] sm:h-64 sm:w-64"
+                />
+              </div>
+              <div className="pt-1">
+                <h1 className="text-2xl text-slate-100 sm:text-4xl">Spyridon Giakoumatos</h1>
+                <p className="mt-2 text-base text-slate-300/90 sm:text-xl">AI Engineer • NTU CS (AI)</p>
+                <p className="mt-4 max-w-2xl text-base text-slate-200/85">
+                  Building practical AI and full-stack systems with strong product focus, measurable outcomes, and
+                  clean engineering execution.
+                </p>
+              </div>
+            </div>
+
+            <aside className="w-full p-1 lg:max-w-sm">
+              <div className="flex items-center gap-3">
+                <p className="text-xl text-slate-100 sm:text-2xl">Level</p>
+                <span className="rounded-full border-2 border-amber-400 px-2 py-0.5 text-lg text-slate-100 sm:text-xl">24</span>
+              </div>
+              <div className="mt-3 flex items-center gap-3 rounded bg-black/35 p-3">
+                <img
+                  src="/years-of-service-4.png"
+                  alt="4 years of service"
+                  className="h-14 w-14 shrink-0 rounded object-cover sm:h-16 sm:w-16"
+                />
+                <div>
+                  <p className="text-base text-slate-200 sm:text-lg">Years of Service</p>
+                  <p className="text-lg text-slate-100 sm:text-xl">750 XP</p>
+                </div>
+              </div>
+              <Link
+                to="/career"
+                className="mt-3 inline-block rounded bg-slate-700/80 px-4 py-2 text-sm text-slate-100 hover:bg-slate-600/80"
+              >
+                View Career
+              </Link>
+            </aside>
           </div>
+
+          <div className="rounded border border-sky-300/20 bg-slate-900/45">
+            <div className="bg-gradient-to-r from-sky-800/45 to-indigo-900/35 px-4 py-2 text-xl text-slate-100">
+              Journey Snapshot
+            </div>
+            <div className="grid gap-4 px-4 py-4 sm:grid-cols-3">
+              <div>
+                <p className="text-3xl text-slate-100 sm:text-4xl">12+</p>
+                <p className="text-base text-slate-300/80">Projects Built</p>
+              </div>
+              <div>
+                <p className="text-3xl text-slate-100 sm:text-4xl">3</p>
+                <p className="text-base text-slate-300/80">Core Domains</p>
+              </div>
+              <div>
+                <p className="text-3xl text-slate-100 sm:text-4xl">2027</p>
+                <p className="text-base text-slate-300/80">Graduation Track</p>
+              </div>
+            </div>
+          </div>
+
+          <RecentActivitySection embedded />
         </div>
       </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="section-card rounded-xl p-5">
-          <h2 className="font-display text-xl text-cyan-100">Now Building</h2>
-          <ul className="mt-3 list-disc space-y-1 pl-5 text-sky-100/85">
-            <li>End to end AI pipeline for software development.</li>
-          </ul>
-        </div>
-        <div className="section-card rounded-xl p-5">
-          <h2 className="font-display text-xl text-cyan-100">Strengths</h2>
-          <ul className="mt-3 grid grid-cols-2 gap-2 text-sm text-sky-100/85">
-            <li>AI Engineering</li>
-            <li>Data Science</li>
-            <li>Software Development</li>
-            <li>Machine Learning</li>
-            <li>Web Development</li>
-          </ul>
-        </div>
-      </div>
-
-      <RecentActivitySection />
     </section>
   );
 }

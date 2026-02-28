@@ -1,103 +1,29 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { Project } from '../types';
 
-const DEFAULT_CSV_URL = '/data/projects.csv';
+const DEFAULT_JSON_URL = '/data/projects.json';
 
-function parseCsv(text: string): string[][] {
-  const rows: string[][] = [];
-  let row: string[] = [];
-  let cell = '';
-  let inQuotes = false;
-
-  for (let index = 0; index < text.length; index += 1) {
-    const char = text[index];
-    const next = text[index + 1];
-
-    if (char === '"') {
-      if (inQuotes && next === '"') {
-        cell += '"';
-        index += 1;
-      } else {
-        inQuotes = !inQuotes;
-      }
-      continue;
-    }
-
-    if (!inQuotes && char === ',') {
-      row.push(cell.trim());
-      cell = '';
-      continue;
-    }
-
-    if (!inQuotes && (char === '\n' || char === '\r')) {
-      if (char === '\r' && next === '\n') {
-        index += 1;
-      }
-      row.push(cell.trim());
-      rows.push(row);
-      row = [];
-      cell = '';
-      continue;
-    }
-
-    cell += char;
-  }
-
-  if (cell.length > 0 || row.length > 0) {
-    row.push(cell.trim());
-    rows.push(row);
-  }
-
-  return rows.filter((csvRow) => csvRow.length > 1 || csvRow[0] !== '');
-}
-
-function splitList(value: string): string[] {
-  if (!value) return [];
-  return value
-    .split('|')
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
-
-function toNumber(value: string, fallback = 0): number {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : fallback;
-}
-
-function mapCsvToProjects(csvText: string): Project[] {
-  const rows = parseCsv(csvText);
-  if (rows.length < 2) return [];
-
-  const [headers, ...dataRows] = rows;
-  const headerIndex = new Map(headers.map((header, index) => [header, index]));
-
-  const get = (row: string[], key: string) => {
-    const idx = headerIndex.get(key);
-    return idx === undefined ? '' : (row[idx] ?? '').trim();
+function normalizeProject(input: Partial<Project>): Project {
+  return {
+    id: input.id ?? '',
+    title: input.title ?? '',
+    summary: input.summary ?? '',
+    description: input.description ?? '',
+    stacks: Array.isArray(input.stacks) ? input.stacks : [],
+    githubUrl: input.githubUrl ?? '',
+    liveUrl: input.liveUrl,
+    banner: input.banner ?? '',
+    hours: Number(input.hours ?? 0),
+    lastUpdated: input.lastUpdated ?? '',
+    progressDone: Number(input.progressDone ?? 0),
+    progressTotal: Number(input.progressTotal ?? 0),
+    badges: Array.isArray(input.badges) ? input.badges : [],
+    extraCount: Number(input.extraCount ?? 0),
+    plannedFeatures: Array.isArray(input.plannedFeatures) ? input.plannedFeatures : []
   };
-
-  return dataRows
-    .map((row) => ({
-      id: get(row, 'id'),
-      title: get(row, 'title'),
-      summary: get(row, 'summary'),
-      description: get(row, 'description'),
-      stacks: splitList(get(row, 'stacks')),
-      githubUrl: get(row, 'githubUrl'),
-      liveUrl: get(row, 'liveUrl') || undefined,
-      banner: get(row, 'banner'),
-      hours: toNumber(get(row, 'hours')),
-      lastUpdated: get(row, 'lastUpdated'),
-      progressDone: toNumber(get(row, 'progressDone')),
-      progressTotal: toNumber(get(row, 'progressTotal')),
-      badges: splitList(get(row, 'badges')),
-      extraCount: toNumber(get(row, 'extraCount')),
-      plannedFeatures: splitList(get(row, 'plannedFeatures'))
-    }))
-    .filter((project) => project.id && project.title && project.summary);
 }
 
-export function RecentActivitySection() {
+export function RecentActivitySection({ embedded = false }: { embedded?: boolean }) {
   const [projectList, setProjectList] = useState<Project[]>([]);
   const allStacks = useMemo(
     () => Array.from(new Set(projectList.flatMap((p) => p.stacks))).sort((a, b) => a.localeCompare(b)),
@@ -108,22 +34,24 @@ export function RecentActivitySection() {
 
   useEffect(() => {
     let isMounted = true;
-    const csvUrl = import.meta.env.VITE_PROJECTS_CSV_URL || DEFAULT_CSV_URL;
+    const jsonUrl = import.meta.env.VITE_PROJECTS_JSON_URL || DEFAULT_JSON_URL;
 
     async function loadProjects() {
       try {
-        const response = await fetch(csvUrl, { cache: 'no-store' });
+        const response = await fetch(jsonUrl, { cache: 'no-store' });
         if (!response.ok) {
-          throw new Error(`Failed to fetch CSV (${response.status})`);
+          throw new Error(`Failed to fetch JSON (${response.status})`);
         }
-        const csvText = await response.text();
-        const parsedProjects = mapCsvToProjects(csvText);
+        const raw = (await response.json()) as Partial<Project>[];
+        const normalized = (Array.isArray(raw) ? raw : [])
+          .map(normalizeProject)
+          .filter((project) => project.id && project.title && project.summary);
 
-        if (isMounted && parsedProjects.length > 0) {
-          setProjectList(parsedProjects);
+        if (isMounted) {
+          setProjectList(normalized);
         }
       } catch (error) {
-        console.warn('Failed to load projects CSV.', error);
+        console.warn('Failed to load projects JSON.', error);
       }
     }
 
@@ -139,9 +67,16 @@ export function RecentActivitySection() {
       : projectList.filter((project) => project.stacks.includes(selectedStack));
   const totalHours = filtered.reduce((sum, project) => sum + project.hours, 0);
 
+  const containerClass = embedded
+    ? 'rounded border border-sky-300/20 bg-slate-900/45 px-3 pb-4 pt-0 sm:px-5 sm:pb-5'
+    : 'section-card rounded-b-xl border-t-0 px-3 pb-4 pt-0 sm:px-5 sm:pb-5';
+  const headerClass = embedded
+    ? 'mx-[-0.75rem] mb-3 flex items-center justify-between bg-gradient-to-r from-sky-900/45 to-indigo-900/35 px-4 py-3 text-xl text-slate-100 sm:mx-[-1.25rem] sm:px-5 sm:text-2xl'
+    : 'mx-[-0.75rem] mb-3 flex items-center justify-between bg-gradient-to-r from-sky-900/45 to-indigo-900/35 px-4 py-3 text-xl text-slate-100 sm:mx-[-1.25rem] sm:px-5 sm:text-2xl';
+
   return (
-    <section className="section-card rounded-b-xl border-t-0 px-3 pb-4 pt-0 sm:px-5 sm:pb-5">
-      <div className="mx-[-0.75rem] mb-3 flex items-center justify-between bg-gradient-to-r from-sky-900/45 to-indigo-900/35 px-4 py-3 text-xl text-slate-100 sm:mx-[-1.25rem] sm:px-5 sm:text-2xl">
+    <section className={containerClass}>
+      <div className={headerClass}>
         <h2>Recent Activity</h2>
         <p>{totalHours.toFixed(1)} hours past 2 weeks</p>
       </div>
