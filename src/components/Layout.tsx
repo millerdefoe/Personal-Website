@@ -36,7 +36,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <main className="mx-auto mt-4 w-full max-w-6xl px-4 pb-8 sm:px-8">{children}</main>
 
       <footer className="mx-auto mt-8 w-full max-w-6xl border-t border-sky-300/20 px-4 py-5 text-sm text-sky-200/70 sm:px-8">
-        Built with React + AWS. Public portfolio for recruiters, private workspace for execution.
+        Built with React + AWS.
       </footer>
     </div>
   );

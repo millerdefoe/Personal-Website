@@ -1,30 +1,31 @@
 const milestones = [
   {
+    period: 'Future',
+    title: 'Your Intern',
+    company: 'Your Company',
+    details:
+      'Maximising Shareholder Value for your company.'
+  },
+  {
     period: '2026',
-    title: 'Portfolio + Interview Preparation',
+    title: 'Data Scientist Intern',
+    company: 'Monetary Authority of Singapore (MAS)',
     details:
-      'Built a Steam-style personal portfolio and prepared project narratives focused on architecture decisions and delivery impact.'
+      'Designed and deployed LangChain RAG pipelines and a DASH platform for MAS workflows; improved answer correctness and vector storage efficiency.'
   },
   {
     period: '2025',
-    title: 'PPoDD',
+    title: 'Artificial Intelligence Engineer Intern',
+    company: 'Home Team Science and Technology Agency (HTX)',
     details:
-      'Developed and iterated on PPoDD with a focus on reliable frontend behavior and clean repository structure for collaboration.',
-    link: 'https://github.com/millerdefoe/PPoDD'
+      'Delivered multi-modal AI for traffic-violation detection (82% precision, 85% recall) and Gen-AI detection pipelines; built Flask backend and REST APIs for enforcement teams.'
   },
   {
     period: '2025',
-    title: 'Where To WebApp Final',
+    title: 'Student AI Researcher',
+    company: 'Nanyang Technological University (NTU)',
     details:
-      'Delivered a full-stack web app with practical UI/UX choices and modular implementation patterns.',
-    link: 'https://github.com/millerdefoe/Where-To-WebApp-Final'
-  },
-  {
-    period: '2024',
-    title: 'BorrowBuddy',
-    details:
-      'Built BorrowBuddy to solve real coordination problems and strengthen product-thinking plus engineering execution.',
-    link: 'https://github.com/millerdefoe/BorrowBuddy'
+      'Designed PyTorch dataset distillation framework; first-author peer-reviewed paper at ICUR 2025.'
   }
 ];
 
@@ -33,7 +34,7 @@ export function CareerPage() {
     <section className="section-card rounded-xl p-5">
       <h1 className="text-3xl text-cyan-100">Career Timeline</h1>
       <p className="mt-2 text-sky-100/85">
-        Snapshot of my engineering journey, projects, and growth trajectory.
+        Where I've worked and what I've done.
       </p>
 
       <div className="mt-5 space-y-4 border-l border-sky-300/30 pl-5">
@@ -42,17 +43,8 @@ export function CareerPage() {
             <span className="absolute -left-[1.62rem] top-5 h-3 w-3 rounded-full bg-cyan-300" />
             <p className="text-xs uppercase tracking-wider text-sky-300">{item.period}</p>
             <h2 className="text-2xl text-slate-100">{item.title}</h2>
+            <p className="mt-0.5 text-slate-300/90">{item.company}</p>
             <p className="mt-1 text-slate-300/90">{item.details}</p>
-            {item.link && (
-              <a
-                href={item.link}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-2 inline-block text-sm text-cyan-200 hover:text-cyan-100"
-              >
-                View project repository
-              </a>
-            )}
           </article>
         ))}
       </div>

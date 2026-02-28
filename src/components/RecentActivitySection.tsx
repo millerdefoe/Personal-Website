@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { projects } from '../data/projects';
 import type { Project } from '../types';
 
 const DEFAULT_CSV_URL = '/data/projects.csv';
@@ -99,7 +98,7 @@ function mapCsvToProjects(csvText: string): Project[] {
 }
 
 export function RecentActivitySection() {
-  const [projectList, setProjectList] = useState<Project[]>(projects);
+  const [projectList, setProjectList] = useState<Project[]>([]);
   const allStacks = useMemo(
     () => Array.from(new Set(projectList.flatMap((p) => p.stacks))).sort((a, b) => a.localeCompare(b)),
     [projectList]
@@ -124,7 +123,7 @@ export function RecentActivitySection() {
           setProjectList(parsedProjects);
         }
       } catch (error) {
-        console.warn('Failed to load projects CSV, using static fallback data.', error);
+        console.warn('Failed to load projects CSV.', error);
       }
     }
 
