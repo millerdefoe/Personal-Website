@@ -8,7 +8,7 @@ export function HomePage() {
         <div className="space-y-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div className="flex flex-col gap-4 sm:flex-row">
-              <div className="relative">
+              <div className="relative mx-auto sm:mx-0">
                 <img
                   src="/profile-photo.JPG"
                   alt="Portrait photo"

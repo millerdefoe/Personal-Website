@@ -116,10 +116,10 @@ export function RecentActivitySection({ embedded = false }: { embedded?: boolean
                   <img
                     src={project.banner}
                     alt={`${project.title} banner`}
-                    className="h-20 w-36 rounded-sm object-cover sm:h-24 sm:w-56"
+                    className="hidden h-20 w-36 rounded-sm object-cover sm:block sm:h-24 sm:w-56"
                   />
                   <div className="min-w-0">
-                    <h3 className="truncate text-3xl text-slate-100">{project.title}</h3>
+                    <h3 className="break-words text-3xl text-slate-100 sm:truncate">{project.title}</h3>
                     <p className="truncate text-sm text-slate-300/80">{project.summary}</p>
                   </div>
                 </div>
@@ -136,7 +136,7 @@ export function RecentActivitySection({ embedded = false }: { embedded?: boolean
                     <p className="text-slate-400">
                       {project.progressDone} of {project.progressTotal}
                     </p>
-                    <div className="h-6 flex-1 rounded-full border border-black/70 bg-slate-950/80 p-1">
+                    <div className="hidden h-6 flex-1 rounded-full border border-black/70 bg-slate-950/80 p-1 sm:block">
                       <div
                         className="h-full rounded-full bg-gradient-to-r from-slate-500 to-slate-300"
                         style={{ width: `${progressPercent}%` }}
